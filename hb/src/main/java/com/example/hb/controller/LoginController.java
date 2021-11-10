@@ -16,8 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.example.hb.dao.MemberDao;
 import com.example.hb.dto.LoginDto;
@@ -83,5 +87,21 @@ public class LoginController {
         return response;
         
     }
-	
+    
+    @RequestMapping(value="/find_id", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public String findid(@RequestParam("mEmail") String mEmail) throws Exception{
+		String result;
+		result=memberDao.findId(mEmail);
+		result = result.replaceAll("(?<=.{3})." , "*");
+		return result;
+	}
+    
+    @RequestMapping(value="/find_pwd", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public RedirectView findpwd(@RequestParam("mId")String mId,@RequestParam("mEmail") String mEmail) throws Exception{
+		String result;
+		result=memberDao.findPwd(mId,mEmail);
+		return new RedirectView("/mail/send?email="+mEmail+"&&pwd="+result);
+    }
 }

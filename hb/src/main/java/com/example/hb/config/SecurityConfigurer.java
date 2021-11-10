@@ -42,6 +42,10 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 	    public void configure(WebSecurity web) throws Exception {
 	    	web.ignoring().antMatchers("/signup/**");
 	    	web.ignoring().antMatchers("/idcheck/**");
+	    	web.ignoring().antMatchers("/emailcheck/**");
+	    	web.ignoring().antMatchers("/find_id/**");
+	    	web.ignoring().antMatchers("/find_pwd/**");
+	    	web.ignoring().antMatchers("/mail/**");
 	    }
 
 	    @Bean

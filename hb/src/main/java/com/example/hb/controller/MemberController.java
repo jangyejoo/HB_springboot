@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.hb.dao.MemberDao;
 import com.example.hb.dao.ProfileDao;
+import com.example.hb.dto.EmailDto;
 import com.example.hb.dto.IdDto;
 import com.example.hb.dto.MemberDto;
 import com.example.hb.dto.ProfileDto;
@@ -72,18 +73,6 @@ public class MemberController {
 		return result;
 	}
 	
-	/*
-	@RequestMapping(value="/create_profile", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
-	@ResponseBody
-	public int createProfile(@RequestBody String objJson) throws Exception{
-		int result;
-		Gson gson = new Gson();
-		ProfileDto dto = gson.fromJson(objJson, ProfileDto.class);
-		result=profileDao.create(dto.getpId(), dto.getpNickname(), dto.getpGym(), dto.getpAge(), dto.getpHeight(), dto.getpWeight(), dto.getpSex(), dto.getpRoutine(), dto.getpDetail(), dto.getpImg(), dto.getpOpen());
-		
-		return result;
-	}
-	*/
 	@RequestMapping(value="/create_profile", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public int createProfile(@RequestParam("pId") String pId, 
@@ -104,12 +93,14 @@ public class MemberController {
 		return result;
 	}
 	
-	@RequestMapping(value="/profile_image", method=RequestMethod.POST)
+	@RequestMapping(value="/emailcheck", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
 	@ResponseBody
-	public String upload(@RequestPart(value="pImg", required=false) MultipartFile file) throws Exception{
-		s3Uploader.upload(file, "test");
-		//profileDao.image(file.getOriginalFilename(), pId);
-        return "good";
+	public int emailCheck(@RequestBody String objJson) throws Exception{
+		int result;
+		Gson gson = new Gson();
+		EmailDto dto = gson.fromJson(objJson, EmailDto.class);
+		result=memberDao.emailCheck(dto.getmEmail());
+		return result;
 	}
 	
 	@ExceptionHandler(value = IllegalArgumentException.class)

@@ -101,6 +101,12 @@
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
         
+        <!-- SMTP -->
+        <dependency>
+        	<groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        
         <!-- s3 설정 -->
         <dependency>
     		<groupId>org.springframework.cloud</groupId>

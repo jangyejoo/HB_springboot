@@ -17,8 +17,21 @@
   	select count(*) from member where mId=#{mId}
   </select>
   
+  <select id="emailCheck" resultType="int">
+  	select count(*) from member where mEmail=#{mEmail}
+  </select>
+  
   <select id="authenticate" resultType="com.example.hb.dto.LoginDto">
   	select * from member where mId=#{mId}
   </select>
+  
+  <select id="findId" resultType="String">
+  	select mId from member where mEmail=#{mEmail}
+  </select>
+  
+   <select id="findPwd" resultType="String">
+  	select mPwd from member where mEmail=#{mEmail} and mId=#{mId}
+  </select>
+  
 
 </mapper>

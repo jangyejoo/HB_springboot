@@ -7,8 +7,17 @@
   <insert id="create">
   	insert into profile(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, pImg, pOpen) values (#{pId}, #{pNickname}, #{pGym}, #{pAge}, #{pHeight}, #{pWeight}, #{pSex}, #{pRoutine}, #{pDetail}, #{pImg}, #{pOpen})
   </insert>
+  
   <update id="image">
   	update profile set pImg=#{pImg} where pId=#{pId}
   </update>
+  
+  <select id="members" resultType="com.example.hb.dto.ProfileDto">
+  	select * from profile where pGym in (select pGym from profile where pId=#{pId}) and pId!=#{pId};
+  </select>
+  
+  <select id="profileCheck" resultType="int">
+  	select count(*) from profile where pId=#{pId}
+  </select>
   
 </mapper>

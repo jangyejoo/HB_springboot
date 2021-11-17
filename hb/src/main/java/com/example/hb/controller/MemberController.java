@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 import javax.swing.filechooser.FileSystemView;
@@ -47,8 +48,8 @@ public class MemberController {
 	@Autowired
 	private S3Uploader s3Uploader;
 	
-	@GetMapping("/members")
-	public List<MemberDto> members() throws Exception {
+	@GetMapping("/member")
+	public List<MemberDto> member() throws Exception {
 		final List<MemberDto> memberList = memberDao.selectMembers();
 		return memberList;
 	}
@@ -73,6 +74,16 @@ public class MemberController {
 		return result;
 	}
 	
+	@RequestMapping(value="/profilecheck", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int profileCheck(@RequestBody String objJson) throws Exception{
+		int result;
+		Gson gson = new Gson();
+		IdDto dto = gson.fromJson(objJson, IdDto.class);
+		result=profileDao.profileCheck(dto.getmId());
+		return result;
+	}
+	
 	@RequestMapping(value="/create_profile", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public int createProfile(@RequestParam("pId") String pId, 
@@ -87,9 +98,9 @@ public class MemberController {
 							@RequestParam("pOpen") String pOpen,
 							@RequestPart(value="pImg", required=false) MultipartFile file) throws Exception{
 		int result;
-		String pImg = file.getOriginalFilename();
-		s3Uploader.upload(file, "test");
-		result=profileDao.create(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, pImg, pOpen);
+		//String pImg = file.getOriginalFilename();
+		String url=s3Uploader.upload(file, "test");
+		result=profileDao.create(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, url, pOpen);
 		return result;
 	}
 	
@@ -101,6 +112,13 @@ public class MemberController {
 		EmailDto dto = gson.fromJson(objJson, EmailDto.class);
 		result=memberDao.emailCheck(dto.getmEmail());
 		return result;
+	}
+	
+	@RequestMapping(value="/members", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public List<ProfileDto> members(@RequestParam("pId") String pId) throws Exception {
+		List<ProfileDto> memberList = profileDao.members(pId);
+		return memberList;
 	}
 	
 	@ExceptionHandler(value = IllegalArgumentException.class)

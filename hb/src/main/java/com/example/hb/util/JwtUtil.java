@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -50,9 +51,25 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
+    
+    public String createRefreshToken(Map<String, Object> claims, String subject){
+        return Jwts.builder()
+                .setClaims(claims) //정보 저장
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis())) //토큰 발행 시간
+                .setExpiration(new Date(System.currentTimeMillis() + 336000 * 60 * 60 * 10)) //토큰 만료 시간
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY) //사용할 암호화 알고리즘
+                .compact();
+    }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String mId = extractUsername(token);
         return (mId.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+    
+    //refresh token 정보 얻어내기
+    public Claims getClaimsFromJwtToken(String jwtToken) throws JwtException {
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwtToken).getBody();
+    }
+    
 }

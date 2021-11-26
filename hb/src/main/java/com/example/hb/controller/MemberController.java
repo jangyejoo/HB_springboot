@@ -27,11 +27,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.hb.dao.ChatDao;
 import com.example.hb.dao.MemberDao;
 import com.example.hb.dao.ProfileDao;
+import com.example.hb.dto.ChatDto;
 import com.example.hb.dto.EmailDto;
 import com.example.hb.dto.IdDto;
 import com.example.hb.dto.MemberDto;
+import com.example.hb.dto.MessageDto;
 import com.example.hb.dto.ProfileDto;
 import com.example.hb.service.S3Uploader;
 import com.google.gson.Gson;
@@ -44,6 +47,9 @@ public class MemberController {
 	
 	@Autowired
 	private ProfileDao profileDao;
+	
+	@Autowired
+	private ChatDao chatDao;
 	
 	@Autowired
 	private S3Uploader s3Uploader;
@@ -119,6 +125,46 @@ public class MemberController {
 	public List<ProfileDto> members(@RequestParam("pId") String pId) throws Exception {
 		List<ProfileDto> memberList = profileDao.members(pId);
 		return memberList;
+	}
+	
+	@RequestMapping(value="/chat", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public List<ChatDto> list(@RequestParam("crId") String crId, 
+			@RequestParam("pId2") String pId2,
+			@RequestParam("pId") String pId ) throws Exception {
+		String crId2 = pId2+"+"+pId;
+		List<ChatDto> chatList = chatDao.list(crId,pId,crId2);
+		return chatList;
+	}
+	
+	@RequestMapping(value="/create_chat", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int createChat (@RequestParam("pId") String pId,
+			@RequestParam("pId2") String pId2,
+			@RequestParam("crId") String crId) throws Exception{
+		int result1;
+		int result2;
+		result1=chatDao.create(pId, crId);
+		result2=chatDao.create(pId2, crId);
+		return result1+result2;
+	}
+	
+	@RequestMapping(value="/msg", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public List<MessageDto> list(@RequestParam("crId") String crId,
+			@RequestParam("mgSender") String mgSender ) throws Exception {
+		List<MessageDto> chatList = chatDao.list2(crId,mgSender);
+		return chatList;
+	}
+	
+	@RequestMapping(value="/create_msg", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int createMsg (@RequestParam("mgSender") String mgSender,
+			@RequestParam("mgDetail") String mgDetail,
+			@RequestParam("chroom") String chroom) throws Exception{
+		int result;
+		result=chatDao.send(mgSender, mgDetail, chroom);
+		return result;
 	}
 	
 	@ExceptionHandler(value = IllegalArgumentException.class)

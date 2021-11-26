@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.hb.dao.ChatDao"><!--namespace를 통해 UserDAO와 연결합니다. -->
+
+  
+  <select id="list" resultType="com.example.hb.dto.ChatDto">
+ 	select * from chat c, profile p where (c.cId=p.pId and c.crId=#{crId} and p.pId != #{pId}) or (c.cId=p.pId and c.crId=#{crId2} and p.pId != #{pId})
+  </select>
+  
+  <select id="list2" resultType="com.example.hb.dto.MessageDto">
+  	select * from profile p, chat c, msg m where m.chroom=c.crId and c.crId=#{crId} and c.cId=p.pId and p.pId != #{mgSender} order by mgDate ASC
+  </select>
+  
+  <insert id="create">
+  	insert into chat(crId, cId) values (#{crId}, #{pId})
+  </insert>
+  
+  <insert id="create2">
+  	insert into chat(crId, cId) values (#{crId}, #{pId2})
+  </insert>
+  
+  <insert id="send">
+  	insert into msg(mgSender, mgDetail, chroom) values (#{mgSender}, #{mgDetail}, #{chroom})
+  </insert>
+  
+  
+  
+</mapper>

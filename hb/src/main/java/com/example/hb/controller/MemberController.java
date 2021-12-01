@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.hb.dao.ChatDao;
+import com.example.hb.dao.MateDao;
 import com.example.hb.dao.MemberDao;
 import com.example.hb.dao.ProfileDao;
 import com.example.hb.dto.ChatDto;
@@ -50,6 +51,9 @@ public class MemberController {
 	
 	@Autowired
 	private ChatDao chatDao;
+	
+	@Autowired
+	private MateDao mateDao;
 	
 	@Autowired
 	private S3Uploader s3Uploader;
@@ -164,6 +168,36 @@ public class MemberController {
 			@RequestParam("chroom") String chroom) throws Exception{
 		int result;
 		result=chatDao.send(mgSender, mgDetail, chroom);
+		return result;
+	}
+	
+	@RequestMapping(value="/create_mate", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int createMate(@RequestParam("mId") String mId,
+			@RequestParam("mtId") String mtId ) throws Exception {
+		int result;
+		result = mateDao.create(mId,mtId);
+		return result;
+	}
+	
+	@RequestMapping(value="/mate", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public Integer checkMate(@RequestParam("mId") String mId,
+			@RequestParam("mtId") String mtId ) throws Exception {
+		Integer result;
+		result=mateDao.list(mId,mtId);
+		System.out.println(result);
+		return result;
+	}
+	
+	@RequestMapping(value="/accept_mate", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int acceptMate(@RequestParam("mId") String mId,
+			@RequestParam("mtId") String mtId ) throws Exception {
+		int result;
+		result = mateDao.accept(mId,mtId);
+		mateDao.update(mId);
+		mateDao.update(mtId);
 		return result;
 	}
 	

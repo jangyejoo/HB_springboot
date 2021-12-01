@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.hb.dao.MateDao"><!--namespace를 통해 UserDAO와 연결합니다. -->
+
+
+  <insert id="create">
+  	insert into mate(mId, mtId) values (#{mId}, #{mtId})
+  </insert>
+  
+  <update id="accept">
+  	update mate set mtAccept=1 where mId=#{mtId} and mtId=#{mId}
+  </update>
+  
+  <select id="list" resultType="Integer">
+  	select mtAccept from mate where mId=#{mtId} and mtId=#{mId}
+  </select>
+  
+  <update id="update">
+  	update profile set pOpen=0 where pId=#{mId};
+  </update>
+  
+</mapper>

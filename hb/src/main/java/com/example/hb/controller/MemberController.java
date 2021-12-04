@@ -94,6 +94,12 @@ public class MemberController {
 		return result;
 	}
 	
+	@RequestMapping(value="/profile", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public ProfileDto profile(@RequestParam("pId") String pId) throws Exception{
+		return profileDao.profile(pId);
+	}
+	
 	@RequestMapping(value="/create_profile", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
 	@ResponseBody
 	public int createProfile(@RequestParam("pId") String pId, 
@@ -111,6 +117,32 @@ public class MemberController {
 		//String pImg = file.getOriginalFilename();
 		String url=s3Uploader.upload(file, "test");
 		result=profileDao.create(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, url, pOpen);
+		return result;
+	}
+	
+	@RequestMapping(value="/update_profile", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int updateProfile(@RequestParam("pId") String pId, 
+							@RequestParam("pNickname") String pNickname,
+							@RequestParam("pGym") String pGym,
+							@RequestParam("pAge") String pAge,
+							@RequestParam("pHeight") String pHeight,
+							@RequestParam("pWeight") String pWeight,
+							@RequestParam("pSex") String pSex,
+							@RequestParam("pRoutine") String pRoutine,
+							@RequestParam("pDetail") String pDetail,
+							@RequestParam("pOpen") String pOpen,
+							@RequestPart(value="pImg", required=false) MultipartFile file) throws Exception{
+		int result;
+		//String pImg = file.getOriginalFilename();
+		if(file==null) {
+			System.out.println("파일이 없습니다");
+			result=profileDao.update2(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, pOpen);
+		} else {
+			System.out.println("파일이 있습니다");
+			String url=s3Uploader.upload(file, "test");
+			result=profileDao.update(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, url, pOpen);
+		}
 		return result;
 	}
 	
@@ -139,6 +171,17 @@ public class MemberController {
 		String crId2 = pId2+"+"+pId;
 		List<ChatDto> chatList = chatDao.list(crId,pId,crId2);
 		return chatList;
+	}
+	
+	@RequestMapping(value="/chatAll", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public List<ChatDto> listAll(@RequestParam("pId") String pId ) throws Exception {
+		String crId = "%+"+pId;
+		String crId2 = pId+"+%";
+		String gym=String.valueOf(chatDao.gym(pId));
+		System.out.println(gym);
+		List<ChatDto> chatListAll = chatDao.listAll(pId, crId, crId2, gym);
+		return chatListAll;
 	}
 	
 	@RequestMapping(value="/create_chat", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
@@ -199,6 +242,33 @@ public class MemberController {
 		mateDao.update(mId);
 		mateDao.update(mtId);
 		return result;
+	}
+	
+	@RequestMapping(value="/delete_mate", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int deleteMate(@RequestParam("mId") String mId,
+			@RequestParam("mtId") String mtId) throws Exception {
+		int result;
+		result=mateDao.delete(mId, mtId);
+		mateDao.update2(mId);
+		mateDao.update2(mtId);
+		return result;
+	}
+	
+	@RequestMapping(value="/buddy", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public ProfileDto buddy(@RequestParam("pId") String pId) throws Exception {
+		String result1;
+		String result2;
+		result1=mateDao.select1(pId);
+		result2=mateDao.select2(pId);
+		if(result1!=null) {
+			return mateDao.buddy(result1);
+		}
+		if(result2!=null) {
+			return mateDao.buddy(result2);
+		}
+		return null;
 	}
 	
 	@ExceptionHandler(value = IllegalArgumentException.class)

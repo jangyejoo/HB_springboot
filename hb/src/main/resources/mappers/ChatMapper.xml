@@ -9,6 +9,14 @@
  	select * from chat c, profile p where (c.cId=p.pId and c.crId=#{crId} and p.pId != #{pId}) or (c.cId=p.pId and c.crId=#{crId2} and p.pId != #{pId})
   </select>
   
+  <select id="listAll" resultType="com.example.hb.dto.ChatDto">
+ 	select * from chat c, profile p where (c.cId=p.pId and p.pId != #{pId} and p.pGym=#{gym} and c.crId like #{crId}) or (c.cId=p.pId and p.pId != #{pId} and p.pGym=#{gym} and c.crId like #{crId2})
+  </select>
+  
+  <select id="gym" resultType="String">
+ 	select pGym from profile where pId=#{pId}
+  </select>
+  
   <select id="list2" resultType="com.example.hb.dto.MessageDto">
   	select * from profile p, chat c, msg m where m.chroom=c.crId and c.crId=#{crId} and c.cId=p.pId and p.pId != #{mgSender} order by mgDate ASC
   </select>

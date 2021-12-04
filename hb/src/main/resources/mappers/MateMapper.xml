@@ -21,4 +21,24 @@
   	update profile set pOpen=0 where pId=#{mId};
   </update>
   
+  <select id="select1" resultType="String">
+  	select mtId from mate where mId=#{pId} and mtAccept=1;
+  </select>
+  
+  <select id="select2" resultType="String">
+  	select mId from mate where mtId=#{pId} and mtAccept=1;
+  </select>
+  
+  <select id="buddy" resultType="com.example.hb.dto.ProfileDto">
+  	select * from profile where pId=#{pId};
+  </select>
+  
+  <delete id="delete">
+  	delete from mate where (mId=#{mId} and mtId=#{mtId}) or (mId=#{mtId} and mtId=#{mId});
+  </delete>
+  
+  <update id="update2">
+  	update profile set pOpen=1 where pId=#{mId};
+  </update>
+  
 </mapper>

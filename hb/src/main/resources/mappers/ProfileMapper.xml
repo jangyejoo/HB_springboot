@@ -8,6 +8,14 @@
   	insert into profile(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, pImg, pOpen) values (#{pId}, #{pNickname}, #{pGym}, #{pAge}, #{pHeight}, #{pWeight}, #{pSex}, #{pRoutine}, #{pDetail}, #{pImg}, #{pOpen})
   </insert>
   
+  <update id="update">
+  	update profile set pNickname=#{pNickname}, pGym=#{pGym}, pAge=#{pAge}, pHeight=#{pHeight}, pWeight=#{pWeight}, pSex=#{pSex}, pRoutine=#{pRoutine}, pDetail=#{pDetail}, pImg=#{pImg}, pOpen=#{pOpen} where pId=#{pId} 
+  </update>
+  
+  <update id="update2">
+  	update profile set pNickname=#{pNickname}, pGym=#{pGym}, pAge=#{pAge}, pHeight=#{pHeight}, pWeight=#{pWeight}, pSex=#{pSex}, pRoutine=#{pRoutine}, pDetail=#{pDetail}, pOpen=#{pOpen} where pId=#{pId} 
+  </update>
+  
   <update id="image">
   	update profile set pImg=#{pImg} where pId=#{pId}
   </update>
@@ -18,6 +26,10 @@
   
   <select id="profileCheck" resultType="int">
   	select count(*) from profile where pId=#{pId}
+  </select>
+  
+  <select id="profile" resultType="com.example.hb.dto.ProfileDto">
+  	select * from profile where pId=#{pId}
   </select>
   
 </mapper>

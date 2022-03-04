@@ -11,15 +11,17 @@ import lombok.Setter;
 @Setter
 public class AuthenticationResponse {
     private String token;
+    private String token_refresh;
     private int result;
 
     public AuthenticationResponse() {
     	
     }
     
-    public AuthenticationResponse(int result, String jwt) {
+    public AuthenticationResponse(int result, String jwt, String jwt_refresh) {
     	this.setResult(result);
         this.setToken(jwt);
+        this.setToken_refresh(jwt_refresh);
     }
 
 	public String getToken() {
@@ -36,5 +38,13 @@ public class AuthenticationResponse {
 
 	public void setResult(int result) {
 		this.result = result;
+	}
+
+	public String getToken_refresh() {
+		return token_refresh;
+	}
+
+	public void setToken_refresh(String token_refresh) {
+		this.token_refresh = token_refresh;
 	}
 }

@@ -33,5 +33,11 @@
   	select mPwd from member where mEmail=#{mEmail} and mId=#{mId}
   </select>
   
-
+	<update id="refresh">
+		update member set refresh=#{refresh} where mId=#{mId}
+	</update>
+	
+	<select id="getRefresh" resultType="String">
+		select refresh from member where mId=#{mId}
+	</select>
 </mapper>

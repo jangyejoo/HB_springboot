@@ -15,4 +15,6 @@ public interface MemberDao {
 	LoginDto authenticate(@Param("mId")String mId);
 	String findId(@Param("mEmail")String mEmail);
 	String findPwd(@Param("mId")String mId, @Param("mEmail")String mEmail);
+	int refresh(@Param("mId")String mId, @Param("refresh")String refresh);
+	String getRefresh(@Param("mId")String mId);
 }

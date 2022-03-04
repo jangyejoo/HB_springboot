@@ -1,6 +1,8 @@
 package com.example.hb.controller;
 
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,7 @@ import com.example.hb.dto.MemberDto;
 import com.example.hb.models.AuthenticationRequest;
 import com.example.hb.models.AuthenticationResponse;
 import com.example.hb.service.MyUserDetailsService;
+import com.example.hb.service.UserService;
 import com.example.hb.util.JwtUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -38,6 +41,10 @@ import com.google.gson.JsonObject;
 @RestController
 @CrossOrigin
 public class LoginController {
+	
+	@Autowired
+	private UserService userService;
+	
 	@Autowired
     private PasswordEncoder passwordEncoder;
 	
@@ -52,6 +59,13 @@ public class LoginController {
 
     @Autowired
     private MyUserDetailsService userDetailsService;
+    
+    @PostMapping("/issue")
+    public ResponseEntity issueAccessToken(HttpServletRequest request) throws Exception {
+    	return ResponseEntity
+    			.ok()
+    			.body(userService.issueAccessToken(request));
+    }
     
     @PostMapping("/login")
     @ResponseBody
@@ -81,11 +95,16 @@ public class LoginController {
         
         final UserDetails userDetails = userDetailsService
        			.loadUserByUsername(authenticationRequest.getUsername());
-       	final String jwt = jwtTokenUtil.generateToken(userDetails);
+       	final String jwt = jwtTokenUtil.generateToken(authenticationRequest.getUsername());
+       	final String refresh = jwtTokenUtil.generateRefreshToken(authenticationRequest.getUsername());
         System.out.println(userDetails);
-       
+        
+        // db에 refresh token 저장
+        memberDao.refresh(authenticationRequest.getUsername(),refresh);
+        
        	response.setResult(200);
         response.setToken(jwt);
+        response.setToken_refresh(refresh);
         return response;
         
     }

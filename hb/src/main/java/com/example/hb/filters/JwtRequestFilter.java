@@ -25,15 +25,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.hb.service.MyUserDetailsService;
 import com.example.hb.util.JwtUtil;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import lombok.RequiredArgsConstructor;
+
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter{
 	 	@Autowired
 	    private MyUserDetailsService userDetailsService;
 
-	    @Autowired
+	 	@Autowired
 	    private JwtUtil jwtUtil;
-
-	    @Override
+	    
+		@Override
 	    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 	            throws ServletException, IOException {
 	        final String authorizationHeader = request.getHeader("Authorization");
@@ -48,13 +51,17 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 	        }
 	        if(mId != null && SecurityContextHolder.getContext().getAuthentication() == null){
 	        	UserDetails userDetails = this.userDetailsService.loadUserByUsername(mId);
-
-	            if(jwtUtil.validateToken(jwt, userDetails)){
-	                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-	                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-	                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-	                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-	            }
+	        	try {
+		            if(jwtUtil.validateToken(jwt)){
+		                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+		                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+		                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+		                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+		            }
+	        	} catch(ExpiredJwtException e) {
+	        		System.out.println("만료된 토큰입니다.");
+	        	}
+	        	
 	        }
 	        chain.doFilter(request,response);
         	

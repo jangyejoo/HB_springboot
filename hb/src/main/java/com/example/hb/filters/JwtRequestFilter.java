@@ -25,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.hb.service.MyUserDetailsService;
 import com.example.hb.util.JwtUtil;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 
@@ -47,20 +48,19 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 	        
 	        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
 		            jwt = authorizationHeader.substring(7);
-		            mId = jwtUtil.extractUsername(jwt);
+		            //mId = jwtUtil.extractUsername(jwt);
+		            Claims claimsToken = jwtUtil.getClaimsFormToken(jwt);
+	                mId = (String)claimsToken.get("username");
+		            System.out.println("mId : "+ mId);
 	        }
 	        if(mId != null && SecurityContextHolder.getContext().getAuthentication() == null){
 	        	UserDetails userDetails = this.userDetailsService.loadUserByUsername(mId);
-	        	try {
-		            if(jwtUtil.validateToken(jwt)){
-		                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-		                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-		                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-		                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-		            }
-	        	} catch(ExpiredJwtException e) {
-	        		System.out.println("만료된 토큰입니다.");
-	        	}
+		        if(jwtUtil.validateToken(jwt)){
+		        	UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+		        			new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+		            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+		            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+		        }
 	        	
 	        }
 	        chain.doFilter(request,response);

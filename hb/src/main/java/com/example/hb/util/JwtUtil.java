@@ -9,6 +9,7 @@ import java.util.function.Function;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtUtil {
+	
+	@Autowired
+	private RedisUtil redisUtil;
+	
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
@@ -49,6 +54,10 @@ public class JwtUtil {
 
     public String resolveRefreshToken(HttpServletRequest request) {
         return request.getHeader("jwt_refresh");
+    }
+    
+    public String resolveId(HttpServletRequest request) {
+        return request.getHeader("mId");
     }
     
     /*
@@ -129,7 +138,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + 1000 * 60 * 1)) // set Expire Time
+                .setExpiration(new Date(now.getTime() + 1000 * 60 * 2)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)  // 사용할 암호화 알고리즘과
                 .compact();
     }
@@ -154,6 +163,15 @@ public class JwtUtil {
             Claims accessClaims = getClaimsFormToken(token);
             System.out.println("Access expireTime: " + accessClaims.getExpiration());
             System.out.println("Access userId: " + accessClaims.get("username"));
+            
+            /*
+            if((redisUtil.getBlackList(token)).toString()!=null) {
+            	throw new Exception("이미 탈퇴한 회원입니다.");
+            }
+            */
+            if (redisUtil.hasKeyBlackList(token)) {
+                throw new Exception("이미 탈퇴한 회원입니다");
+            }
             return true;
         } catch (ExpiredJwtException exception) {
             System.out.println("Token Expired UserID : " + exception.getClaims().get("username"));
@@ -163,6 +181,12 @@ public class JwtUtil {
             return false;
         } catch (NullPointerException exception) {
             System.out.println("Token is null");
+            System.out.println("msg1 : " + exception.getMessage());
+            System.out.println("msg2 : " + exception.getCause());
+
+            return false;
+        } catch (Exception e) {
+            System.out.println("이미 탈퇴한 회원입니다.");
             return false;
         }
     }

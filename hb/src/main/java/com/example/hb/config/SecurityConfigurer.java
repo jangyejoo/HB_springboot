@@ -47,6 +47,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 	    	web.ignoring().antMatchers("/find_pwd/**");
 	    	web.ignoring().antMatchers("/mail/**");
 	    	web.ignoring().antMatchers("/issue/**");
+	    	web.ignoring().antMatchers("/logout/**");
 	    }
 
 	    @Bean

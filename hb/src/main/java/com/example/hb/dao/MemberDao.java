@@ -17,4 +17,9 @@ public interface MemberDao {
 	String findPwd(@Param("mId")String mId, @Param("mEmail")String mEmail);
 	int refresh(@Param("mId")String mId, @Param("refresh")String refresh);
 	String getRefresh(@Param("mId")String mId);
+	int updatePwd(@Param("mId")String mId, @Param("newPwd")String newPwd);
+	String getPwd(@Param("mId")String mId);
+	int withdrawMember(@Param("mId")String mId);
+	int withdrawProfile(@Param("mId")String mId);
+	int deleteMate(@Param("mId")String mId);
 }

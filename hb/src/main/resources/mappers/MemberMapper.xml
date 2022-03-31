@@ -13,6 +13,14 @@
   	insert into member(mId, mPwd, mEmail) values (#{mId}, #{mPwd}, #{mEmail})
   </insert>
   
+  <update id="updatePwd">
+  	update member set mPwd=#{newPwd} where mId=#{mId}
+  </update>
+  
+  <select id="getPwd" resultType="String">
+  	select mPwd from member where mId=#{mId}
+  </select>
+  
   <select id="idCheck" resultType="int">
   	select count(*) from member where mId=#{mId}
   </select>
@@ -40,4 +48,16 @@
 	<select id="getRefresh" resultType="String">
 		select refresh from member where mId=#{mId}
 	</select>
+	
+	<delete id="withdrawProfile">
+		delete from profile where pId=#{mId}
+	</delete>
+	
+	<delete id="withdrawMember">
+		delete from member where mId=#{mId}
+	</delete>
+	
+	<delete id="deleteMate">
+		delete from mate where mId=#{mId} or mtId=#{mId}
+	</delete>
 </mapper>

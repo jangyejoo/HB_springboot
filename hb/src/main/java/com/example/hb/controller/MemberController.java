@@ -2,6 +2,7 @@ package com.example.hb.controller;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import com.example.hb.dto.IdDto;
 import com.example.hb.dto.MemberDto;
 import com.example.hb.dto.MessageDto;
 import com.example.hb.dto.ProfileDto;
+import com.example.hb.dto.PwdDto;
 import com.example.hb.service.S3Uploader;
 import com.google.gson.Gson;
 
@@ -72,6 +74,45 @@ public class MemberController {
 		MemberDto dto = gson.fromJson(objJson, MemberDto.class);
 		result=memberDao.signUp(dto.getmId(), dto.getmPwd(), dto.getmEmail());
 		return result;		
+	}
+	
+	@RequestMapping(value="/update_password", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int updatePwd(@RequestBody String objJson) throws Exception{
+		int result=0;
+		String pwd;
+		Gson gson = new Gson();
+		PwdDto dto = gson.fromJson(objJson, PwdDto.class);
+		pwd = memberDao.getPwd(dto.getmId());
+		System.out.println("pwd : "+pwd);
+		if(pwd.equals(dto.getmPwd())) {
+			System.out.println("일치");
+			result = memberDao.updatePwd(dto.getmId(),dto.getnewPwd());
+		}
+		return result;
+		
+	}
+	
+	@RequestMapping(value="/withdrawal", method=RequestMethod.POST, produces="application/json; charset=UTF-8")
+	@ResponseBody
+	public int withdraw(@RequestBody String objJson) throws Exception{
+		int result;
+		Gson gson = new Gson();
+		IdDto dto = gson.fromJson(objJson, IdDto.class);
+		result = memberDao.withdrawProfile(dto.getmId());
+		result *= memberDao.withdrawMember(dto.getmId());
+		String result1;
+		String result2;
+		result1=mateDao.select1(dto.getmId());
+		result2=mateDao.select2(dto.getmId());
+		if(result1!=null) {
+			mateDao.update2(result1);
+		}
+		if(result2!=null) {
+			mateDao.update2(result2);
+		}
+		memberDao.deleteMate(dto.getmId());
+		return result;
 	}
 	
 	@RequestMapping(value="/idcheck", method=RequestMethod.POST, produces="application/json; charset=UTF-8")

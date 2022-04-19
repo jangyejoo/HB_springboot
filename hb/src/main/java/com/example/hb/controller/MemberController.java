@@ -156,7 +156,12 @@ public class MemberController {
 							@RequestPart(value="pImg", required=false) MultipartFile file) throws Exception{
 		int result;
 		//String pImg = file.getOriginalFilename();
-		String url=s3Uploader.upload(file, "test");
+		String url;
+		if(file==null) {
+			url = "test/user.png";
+		} else {
+			url=s3Uploader.upload(file, "test");
+		}
 		result=profileDao.create(pId, pNickname, pGym, pAge, pHeight, pWeight, pSex, pRoutine, pDetail, url, pOpen);
 		return result;
 	}

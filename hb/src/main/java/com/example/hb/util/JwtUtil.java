@@ -138,7 +138,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + 1000 * 60 * 2)) // set Expire Time
+                .setExpiration(new Date(now.getTime() + 1000 * 60 * 5)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)  // 사용할 암호화 알고리즘과
                 .compact();
     }
@@ -147,7 +147,7 @@ public class JwtUtil {
         Claims claims = Jwts.claims();
         claims.put("username", userId); //
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + 1000 * 60 * 5);
+        Date expiration = new Date(now.getTime() + 1000 * 60 * 8);
 
         return Jwts.builder()
         		.setClaims(claims)
